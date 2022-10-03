@@ -3,8 +3,8 @@ import React from "react";
 import Titles from "./Components/Titles";
 import Form from "./Components/Form";
 import Weather from "./Components/Weather";
-
-const API_KEY = "4357a4caaaf40ce9a20183534a69a528";
+ 
+const API_KEY = "4c74cd9965ad22f4ae36b899ad0ecd19";
 
 class App extends React.Component {
     state={
@@ -17,12 +17,14 @@ class App extends React.Component {
     }
     getWeather =  async(e) => {
         e.preventDefault();
-        const city = e.target.elements.city.value;
-        const country = e.target.elements.country.value;
-        const api_call = await fetch('http://api.openweathermap.org/data/2.5/weather?q=' + city + ',' + country + '&appid=4357a4caaaf40ce9a20183534a69a528&units=imperial');
-        const data = await api_call.json();
-        if(city && country){
-            console.log(data);
+        const city = e.target.elements.City.value;
+        const state = e.target.elements.State.value;
+        if(city && state){
+            const geoResponse = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${city},${state},USA&appid=${API_KEY}`)
+            const geoDataJSON = await geoResponse.json()
+            const {lat, lon} = geoDataJSON[0]
+            const api_call = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`);
+            const data = await api_call.json();
             this.setState({
                 temp:  data.main.temp,
                 city: data.name,
@@ -38,7 +40,7 @@ class App extends React.Component {
                 country: undefined,
                 humidity: undefined,
                 description: undefined,
-                error: "Please enter a valid City and Country."
+                error: "Please enter a valid City and State."
             })
         }
         
@@ -61,7 +63,7 @@ class App extends React.Component {
                                     <Weather
                                         temp={this.state.temp}
                                         city={this.state.city}
-                                        country={this.state.country}
+                                        state={this.state.state}
                                         humidity={this.state.humidity}
                                         description={this.state.description}
                                         error={this.state.error}
